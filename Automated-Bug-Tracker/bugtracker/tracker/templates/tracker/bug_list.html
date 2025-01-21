@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bug Tracker</title>
+</head>
+<body>
+    <h1>Bug List</h1>
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Reporter</th>
+            <th>Assignee</th>
+        </tr>
+        {% for bug in bugs %}
+        <tr>
+            <td>{{ bug.title }}</td>
+            <td>{{ bug.severity }}</td>
+            <td>{{ bug.status }}</td>
+            <td>{{ bug.reporter.username }}</td>
+            <td>
+                {% if bug.assignee %}
+                    {{ bug.assignee.username }}
+                {% else %}
+                    Unassigned
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
