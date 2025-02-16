@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automated Bug Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .sign-out-btn {
+      background-color: #dc3545;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .sign-out-btn:hover {
+      background-color: #c82333;
+    }
+    .container {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px;
+      flex: 1;
+    }
+    .section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    .profile {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .profile img {
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 10px;
+    }
+    .profile h2 {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    .profile-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .manage-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .manage-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Automated Bug Tracker</h1>
+    <a href="{% url 'logout' %}" class="sign-out-btn">Sign Out</a>
+  </header>
+  
+  <div class="container">
+    <div class="section left">
+      <div class="profile">
+        <h3>My Profile</h3>
+        <img src="{% static 'images/blank_pp.png' %}" alt="Profile Picture">
+        <h2>{{ user.username }}</h2>
+        <p>Role: {{ user.role }}</p>
+        <div class="profile-buttons">
+          <a href="{% url 'bug-list' %}" class="manage-btn">Manage Bugs</a>
+          {% if user.role == "Admin" or user.role == "Developer" %}
+            <a href="{% url 'user-management' %}" class="manage-btn">Manage Users</a>
+            {% endif %}
+            <a href="{% url 'my-area' %}" class="manage-btn">My Area</a>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="section center">
+      <h3>Active Bugs</h3>
+      <table>
+        <tr>
+          <th>Title</th>
+          <th>Severity</th>
+          <th>Status</th>
+          <th>Reporter</th>
+          <th>Assigned To</th>
+          <th>Created At</th>
+        </tr>
+        {% for bug in bugs %}
+          {% if bug.status == "Open" or bug.status == "In Progress" %}
+            <tr>
+              <td>{{ bug.title }}</td>
+              <td>{{ bug.severity }}</td>
+              <td>{{ bug.status }}</td>
+              <td>{{ bug.reporter }}</td>
+              <td>{{ bug.assignee|default:"Unassigned" }}</td>
+              <td>{{ bug.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+  
+  <footer>
+    Automated Bug Tracker System
+  </footer>
+</body>
+</html>

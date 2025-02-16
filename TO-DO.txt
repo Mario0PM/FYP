@@ -1,0 +1,176 @@
+1. Define Project Goals and Features
+Features:
+User Roles:
+
+Admin: Manages users and assigns bugs.
+Developer: Works on fixing bugs.
+Tester: Reports bugs.
+Bug Reporting: Include details like title, description, severity (Critical, High, Medium, Low), status (Open, In Progress, Resolved, Closed), and timestamps.
+
+Bug Assignment: Bugs can be assigned to specific developers.
+
+Bug Status Tracking: View and update bug statuses.
+
+Search & Filter: Query bugs based on severity, status, and assignee.
+
+Notifications: Notify relevant users of updates (via email or UI).
+
+2. Choose Tools and Technologies
+Technologies:
+Backend: Python with Django (built-in ORM and admin features).
+Frontend: HTML, CSS, JavaScript, Django Templates.
+Database: SQLite (development) and PostgreSQL (production).
+Testing: unittest and pytest.
+Version Control: Git, with hosting on GitHub.
+Optional Enhancements: Bootstrap for UI, Django Rest Framework (DRF) for APIs.
+
+3. Design the System Structure
+Key Entities and Relationships:
+User: Represents the three roles with fields like username, email, password, and role.
+Bug: Contains details about bugs reported, assigned, and updated.
+Database Models:
+python
+Copiază codul
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    ROLE_CHOICES = [
+        ('Admin', 'Admin'),
+        ('Developer', 'Developer'),
+        ('Tester', 'Tester'),
+    ]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+
+class Bug(models.Model):
+    SEVERITY_CHOICES = [
+        ('Critical', 'Critical'),
+        ('High', 'High'),
+        ('Medium', 'Medium'),
+        ('Low', 'Low'),
+    ]
+    STATUS_CHOICES = [
+        ('Open', 'Open'),
+        ('In Progress', 'In Progress'),
+        ('Resolved', 'Resolved'),
+        ('Closed', 'Closed'),
+    ]
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='Open')
+    reporter = models.ForeignKey(User, related_name='reported_bugs', on_delete=models.CASCADE)
+    assignee = models.ForeignKey(User, related_name='assigned_bugs', null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+Workflow Implementation:
+Authentication:
+
+Use Django's built-in authentication system.
+Restrict views by user role (e.g., only Admins can assign bugs).
+Bug Management:
+
+Testers can create new bugs.
+Developers can update the bug status.
+Admins can assign bugs to developers.
+Search and Filter:
+
+Implement using Django ORM query filters in views.
+Use templates for displaying filtered results.
+
+4. Setup and Start Coding
+Step-by-Step Setup:
+Initialize Project:
+
+bash
+Copiază codul
+django-admin startproject bugtracker
+cd bugtracker
+python manage.py startapp tracker
+Configure Installed Apps (in settings.py):
+
+python
+Copiază codul
+INSTALLED_APPS = [
+    ...
+    'tracker',
+    'django.contrib.admin',
+    'django.contrib.auth',
+]
+Migrations:
+
+bash
+Copiază codul
+python manage.py makemigrations
+python manage.py migrate
+Create Superuser (Admin):
+
+bash
+Copiază codul
+python manage.py createsuperuser
+Views and Templates:
+Use Django class-based views (ListView, DetailView, CreateView, etc.) for CRUD operations.
+Example for Bug List View:
+python
+Copiază codul
+from django.views.generic import ListView
+from .models import Bug
+
+class BugListView(ListView):
+    model = Bug
+    template_name = 'tracker/bug_list.html'
+    context_object_name = 'bugs'
+
+    def get_queryset(self):
+        return Bug.objects.filter(status='Open').order_by('-created_at')
+URLs (in tracker/urls.py):
+python
+Copiază codul
+from django.urls import path
+from .views import BugListView
+
+urlpatterns = [
+    path('bugs/', BugListView.as_view(), name='bug-list'),
+]
+
+5. Testing and Notification
+Testing:
+Use Django’s testing framework:
+python
+Copiază codul
+from django.test import TestCase
+from .models import User, Bug
+
+class BugModelTest(TestCase):
+    def test_bug_creation(self):
+        user = User.objects.create_user(username='tester', role='Tester')
+        bug = Bug.objects.create(
+            title='Sample Bug',
+            description='A test bug',
+            severity='High',
+            status='Open',
+            reporter=user
+        )
+        self.assertEqual(bug.status, 'Open')
+Notifications:
+Use Django’s send_mail for email notifications.
+Add signals to notify users of bug status updates.
+
+6. Deploying the Project
+Push Code to GitHub:
+
+bash
+Copiază codul
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin <your-repo-url>
+git push -u origin main
+Deploy to Production (e.g., Heroku, AWS, or PythonAnywhere):
+
+Use Gunicorn and PostgreSQL for deployment.
+Set up CI/CD workflows using GitHub Actions.
+Configure Environment Variables:
+
+Use django-environ for secret keys and database credentials.

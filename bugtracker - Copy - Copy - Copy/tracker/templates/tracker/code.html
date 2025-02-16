@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Linter</title>
+</head>
+<body>
+    <h1>Check Your Python Code for Bugs</h1>
+    
+    <form action="/" method="post">
+        <label for="python_code">Enter Python code:</label><br><br>
+        <textarea id="python_code" name="python_code" rows="10" cols="50"></textarea><br><br>
+        <button type="submit">Check Code</button>
+    </form>
+    
+    <h2>Pylint Output</h2>
+    <pre>{{ pylint_output }}</pre>
+</body>
+</html>

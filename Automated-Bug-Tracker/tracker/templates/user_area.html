@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Area - Assigned Bugs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #007bff;
+    }
+    .bug {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      background-color: #f1f1f1;
+    }
+    .bug-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 5px;
+    }
+    .bug-details {
+      display: none;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>My Area</h1>
+
+    {% for bug in assigned_bugs %}
+      <div class="bug">
+        <div class="bug-header" onclick="toggleDetails('bug{{ bug.id }}')">
+          <strong>{{ bug.title }}</strong>
+          <span>Status: {{ bug.status }}</span>
+        </div>
+        <div class="bug-details" id="bug{{ bug.id }}">
+          <p><strong>Severity:</strong> {{ bug.severity }}</p>
+          <p><strong>Description:</strong> {{ bug.description }}</p>
+          <form action="{% url 'auto_fix' bug.id %}" method="post">
+            {% csrf_token %}
+            <textarea name="code_input" placeholder="Paste the problematic code here..."></textarea>
+            <button type="submit">Fix Code</button>
+          </form>
+        </div>
+      </div>
+    {% empty %}
+      <p>No bugs assigned to you.</p>
+    {% endfor %}
+
+  </div>
+
+  <script>
+    function toggleDetails(id) {
+      var element = document.getElementById(id);
+      element.style.display = element.style.display === "none" ? "block" : "none";
+    }
+  </script>
+
+</body>
+</html>
